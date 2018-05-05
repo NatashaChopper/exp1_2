@@ -1,0 +1,68 @@
+---
+title: "exp1"
+author: "Natalia Kalashnikova"
+date: "05 05 2018"
+output: html_document
+---
+
+#SM - sarcasme; SS - sincere+sarcasme; SR - sincere
+
+```{r}
+library(readxl)
+setwd("~/")
+exp1 <- readxl::read_excel("~/exp1_2/exp1.xlsx")
+exp1
+```
+#La moyenne pour chaque condition et nombre de reponses
+
+```{r}
+moyenne_condition <- dplyr::summarise(dplyr::group_by(exp1, Type), percent_correct = mean(Answer))
+quantite <- dplyr::summarise(dplyr::group_by(exp1, Type), n = n())
+moyenne_condition
+```
+#GLM pour trois combinaisons
+```{r}
+# Sarcastique vs Sincere: detection de sarcasme
+summary(glm(Answer~Type, data=exp1[exp1$Type %in% c("Sincere", "Sarcasme"),], family=binomial))
+```
+
+```{r}
+# SincSarc vs Sincere: effet de prosodie
+summary(glm(Answer~Type, data=exp1[exp1$Type %in% c("SincSarc", "Sincere"),], family=binomial))
+```
+
+```{r}
+# Sarcastique vs SincSarc: effet de contexte
+summary(glm(Answer~Type, data=exp1[exp1$Type %in% c("Sarcasme", "SincSarc"),], family=binomial))
+```
+#ggplot des conditions
+```{r}
+percent_sincere <- dplyr::summarise(dplyr::group_by(exp1, Type), percent_sincere = mean(Answer))
+ggplot2::ggplot(percent_sincere, ggplot2::aes(x = Type, y = percent_sincere, fill=Type)) + ggplot2::geom_bar(stat="identity")
+```
+
+
+
+#je suis pas sûre - je voulais faire comme si on a 45 participants pour tous les stimuli
+```{r}
+set.seed(40)
+diff_sm_ss <- rep(0, 999)
+pval_sm_ss <- rep(0, 999)
+n_mult <- 3
+for (i in 1:999) {
+  exp1_imaginary <- dplyr::bind_rows(exp1, exp1, exp1)
+  exp1_imaginary[exp1_imaginary$Type=="SincSarc","Answer"] <- c(sample(exp1[exp1$Type == "Sincere",]$Answer, n_mult*3, replace=TRUE),
+                                                                 sample(exp1[exp1$Type == "Sarcasme",]$Answer, n_mult*255, replace=TRUE))
+  exp1_imaginary[exp1_imaginary$Type=="Sincere","Answer"] <- c(sample(exp1[exp1$Type == "Sincere",]$Answer, n_mult*267, replace=TRUE))
+  exp1_imaginary[exp1_imaginary$Type=="Sarcasme","Answer"] <- c(sample(exp1[exp1$Type == "Sarcasme",]$Answer, n_mult*255, replace=TRUE))
+  diff_sm_ss[i] <- coef(summary(glm(Answer~Type, data=exp1_imaginary[exp1_imaginary$Type %in% c("Sarcasme", "SincSarc"),], family=binomial(link = logit))))[2,1]
+  pval_sm_ss[i] <- coef(summary(glm(Answer~Type, data=exp1_imaginary[exp1_imaginary$Type %in% c("Sarcasme", "SincSarc"),], family=binomial(link = logit))))[2,4]
+}
+set.seed(NULL)
+```
+#le graphique pour la version imaginaire
+```{r}
+percent_sincere_im <- dplyr::summarise(dplyr::group_by(exp1_imaginary, Type), percent_sincere_im = mean(Answer))
+ggplot2::ggplot(percent_sincere_im, ggplot2::aes(x = Type, y = percent_sincere_im, fill=Type)) + ggplot2::geom_bar(stat="identity")
+```
+

@@ -1,0 +1,30 @@
+---
+title: "exp2"
+author: "Natalia Kalashnikova"
+date: "05 05 2018"
+output: html_document
+---
+
+#SM - sarcasme; SR - sincere
+
+```{r}
+library(readxl)
+setwd("~/")
+exp2 <- readxl::read_excel("~/exp1_2/experience2.xlsx")
+exp2
+```
+#La moyenne pour chaque condition et nombre de reponses
+
+```{r}
+moyenne_condition <- dplyr::summarise(dplyr::group_by(exp2, Type), percent_correct = mean(Answer))
+quantite <- dplyr::summarise(dplyr::group_by(exp2, Type), n = n())
+quantite
+moyenne_condition
+```
+
+#ggplot des conditions
+```{r}
+percent_sincere <- dplyr::summarise(dplyr::group_by(exp2, Type), percent_sincere = mean(Answer))
+ggplot2::ggplot(percent_sincere, ggplot2::aes(x = Type, y = percent_sincere, fill=Type)) + ggplot2::geom_bar(stat="identity")
+```
+

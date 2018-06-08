@@ -1,0 +1,143 @@
+---
+title: "acoustic"
+author: "Natalia Kalashnikova"
+date: "08 06 2018"
+output: html_document
+---
+
+```{r}
+library(readxl)
+setwd("~/")
+data <- readxl::read_excel("~/exp1_2/o.xlsx")
+data
+
+```
+#les données de la fille
+#pitch mean 
+```{r}
+library(ggplot2)
+
+fmean <- ggplot(data, aes(x=f0mean, color=place)) + geom_histogram(fill="white", position="dodge",binwidth = 5 )  
+fmean
+```
+
+#pitch SD 
+```{r}
+fsd <- ggplot(data, aes(x=f0SD, color=place)) + geom_histogram(fill="white", binwidth = 5, position="dodge")
+fsd
+```
+#intenrsity mean
+```{r}
+imean <- ggplot(data, aes(x=int, color=place)) + geom_histogram(fill="white", position="dodge", binwidth = 2)
+imean
+```
+#intensity SD
+```{r}
+intsd <- ggplot(data, aes(x=intSD, color=place)) + geom_histogram(fill="white", binwidth = 2, position="dodge")
+intsd
+```
+#debit
+```{r}
+debit <- ggplot(data, aes(x=debit, color=place)) + geom_histogram(fill="white", binwidth = 1, position="dodge")
+debit
+```
+
+#les données du garçon
+
+```{r}
+library(readxl)
+setwd("~/")
+data1 <- readxl::read_excel("~/exp1_2/j.xlsx")
+data1
+```
+#F0 mean
+```{r}
+fmean1 <- ggplot(data1, aes(x=f0mean, color=place)) + geom_histogram(fill="white", position="dodge",binwidth = 5 )  
+fmean1
+```
+#F0 SD
+```{r}
+fsd1 <- ggplot(data1, aes(x=f0SD, color=place)) + geom_histogram(fill="white", binwidth = 5, position="dodge")
+fsd1
+```
+#intensity mean
+```{r}
+imean1 <- ggplot(data1, aes(x=int, color=place)) + geom_histogram(fill="white", position="dodge", binwidth = 2)
+imean1
+```
+#intensity SD
+```{r}
+intsd1 <- ggplot(data1, aes(x=intSD, color=place)) + geom_histogram(fill="white", binwidth = 2, position="dodge")
+intsd1
+```
+#débit
+```{r}
+debit1 <- ggplot(data1, aes(x=debit, color=place)) + geom_histogram(fill="white", binwidth = 1, position="dodge")
+debit1
+```
+
+#la comparaison entre les deux locuteurs
+```{r}
+commun <- dplyr::bind_rows(data, data1)
+commun
+```
+#débit
+```{r}
+vitesse <- ggplot(commun, aes(x = speaker, y = debit, fill=place))+
+  geom_violin()
+vitesse
+```
+#F0 mean
+```{r}
+f <- ggplot(commun, aes(x = speaker, y = f0mean, fill=place))+
+  geom_violin()
+f
+```
+#F0 SD
+```{r}
+fet <- ggplot(commun, aes(x = speaker, y = f0SD, fill=place))+
+  geom_violin()
+fet
+```
+#intensity mean
+```{r}
+i <- ggplot(commun, aes(x = speaker, y = int, fill=place))+
+  geom_violin()
+i
+```
+#intensity SD
+```{r}
+iet <- ggplot(commun, aes(x = speaker, y = intSD, fill=place))+
+  geom_violin()
+iet
+```
+
+#apparemment c'est l'analyse de chaque paramètre entre le sarcasme et le non-sarcasme
+```{r}
+summary(lm(debit~place, data=commun))
+```
+```{r}
+summary(lm(f0mean~place, data=commun))   
+```
+```{r}
+summary(lm(int~place, data=commun)) 
+```
+```{r}
+summary(lm(intSD~place, data=commun))
+```
+```{r}
+summary(lm(f0SD~place, data=commun))
+```
+
+     
+
+
+
+
+
+
+
+
+
+
+
